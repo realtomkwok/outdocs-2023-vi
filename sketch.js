@@ -5,8 +5,8 @@ let imgWidth
 let imgHeight
 
 // canvas configs
-let canvasWidth = 1280
-let canvasHeight = 720
+let canvasWidth = 1096
+let canvasHeight = 1550
 let canvasImgRatio_H
 let canvasImgRatio_V
 
@@ -24,11 +24,20 @@ function setup() {
     createCanvas(canvasWidth, canvasHeight)
     imgRatio = img.height / img.width
 
-    imgWidth = canvasWidth / 2
-    imgHeight = imgWidth * imgRatio
+    if (imgRatio <= 1) {
+        imgWidth = canvasWidth / 2
+        imgHeight = imgWidth * imgRatio
+    } else if (imgRatio > 1) {
+        imgHeight = canvasHeight / 2
+        imgWidth = imgHeight / imgRatio
+    }
+
 
     canvasImgRatio_H = canvasWidth / imgWidth
     canvasImgRatio_V = canvasHeight / imgHeight
+
+    console.log(canvasImgRatio_V)
+    console.log(canvasImgRatio_H)
 
     canvasVertex = {
         NW: {
@@ -67,14 +76,13 @@ function setup() {
             y: (height - imgHeight) / 2 + imgHeight - 1
         }
     }
-
-
 }
 
 function draw() {
-    background(0)
+    // background(0)
     imageMode(CENTER)
     image(img, canvasWidth / 2, canvasHeight / 2, imgWidth, imgHeight)
+
 
     // extending the pixel to the edge
     // vertexes of the light shape
@@ -162,11 +170,44 @@ function draw() {
         }
     }
 
+    function lightTunnel(step, vertexes, increment) {
+        let shapeColor
+        for (let i = 0; i < step; i++) {
+            shapeColor = get(vertexes.v1.x, vertexes.v1.y)
+            fill(shapeColor)
+            stroke(shapeColor)
+            strokeWeight(1)
+            beginShape(LINES)
+            vertex(canvasWidth / 2, canvasHeight / 2)
+            vertex(vertexes.v2.x, vertexes.v2.y)
+            endShape()
+
+            if (increment === canvasImgRatio_H) {
+                vertexes.v1.x += 1
+                vertexes.v2.x += 1
+            } else if (increment === canvasImgRatio_V) {
+                vertexes.v1.y += 1
+                vertexes.v2.y += 1
+            }
+        }
+    }
+
 
     pixelExtension(imgWidth, shapeVertex.north, canvasImgRatio_H)
     pixelExtension(imgHeight, shapeVertex.east, canvasImgRatio_V)
     pixelExtension(imgWidth, shapeVertex.south, canvasImgRatio_H)
     pixelExtension(imgHeight, shapeVertex.west, canvasImgRatio_V)
 
+    //
+    // lightTunnel(imgWidth, shapeVertex.north, canvasImgRatio_H)
+    // lightTunnel(imgHeight, shapeVertex.east, canvasImgRatio_V)
+    // lightTunnel(imgWidth, shapeVertex.south, canvasImgRatio_H)
+    // lightTunnel(imgHeight, shapeVertex.west, canvasImgRatio_V)
+
+    // fill("black")
+    // stroke("black")
+    // beginShape(QUADS)
+    // rectMode(CENTER)
+    // rect(canvasWidth / 2, canvasHeight / 2, imgWidth * 1.5, imgHeight * 1.5)
 
 }
